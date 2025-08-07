@@ -1,10 +1,9 @@
-# app.py
-
 from flask_cors import CORS
 from flask import Flask, request, jsonify
 from PIL import Image
 import numpy as np
 import tensorflow as tf
+import os
 
 # === App Setup ===
 app = Flask(__name__)
@@ -13,7 +12,7 @@ CORS(app)
 # === Load Trained Model ===
 model = tf.keras.models.load_model('model.h5')
 
-# === Your Class Labels (7 Classes) ===
+# === Automatically Get Class Labels from Directory Order ===
 CLASS_LABELS = [
     'books_stationery',
     'clothing_fashion',
@@ -24,7 +23,7 @@ CLASS_LABELS = [
     'jewelry'
 ]
 
-# === Packaging Suggestions (Based on Class) ===
+# === Packaging Suggestions ===
 suggestions = {
     'books_stationery': {
         'internal': 'recycled kraft paper',
@@ -75,12 +74,17 @@ def classify_image():
         processed = preprocess_image(image)
 
         prediction = model.predict(processed)[0]
-        predicted_class = CLASS_LABELS[np.argmax(prediction)]
-        confidence_score = float(np.max(prediction))
+
+        if np.sum(prediction) == 0:
+            predicted_class = 'unknown'
+            confidence = 0.0
+        else:
+            predicted_class = CLASS_LABELS[np.argmax(prediction)]
+            confidence = float(np.max(prediction)) * 100
 
         return jsonify({
             'product_type': predicted_class,
-            'prediction_confidence': f"{confidence_score:.2%}",
+            'prediction_accuracy': f"{confidence:.2f}%",
             'packaging_suggestion': suggestions.get(predicted_class, {})
         })
 
