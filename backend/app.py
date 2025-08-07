@@ -23,36 +23,84 @@ CLASS_LABELS = [
 
 suggestions = {
     'books_stationery': {
-        'internal': 'recycled kraft paper',
-        'external': 'corrugated envelopes'
+        'internal': {
+            'material': 'recycled kraft paper',
+            'reason': 'Eco-friendly cushioning for books, pens, notebooks and other stationery; reduces waste and is recyclable.'
+        },
+        'external': {
+            'material': 'corrugated envelopes',
+            'reason': 'Protective and lightweight, suitable for most stationery items, and made from recycled paper.'
+        }
     },
     'clothing_fashion': {
-        'internal': 'compostable polybags',
-        'external': 'jute bags'
+        'internal': {
+            'material': 'compostable polybags',
+            'reason': 'Protects garments from dust/moisture while decomposing naturally in compost.'
+        },
+        'external': {
+            'material': 'jute bags',
+            'reason': 'Reusable and biodegradable material, perfect for shipping apparel sustainably.'
+        }
     },
     'cosmetic_bottle': {
-        'internal': 'paper mesh wrap',
-        'external': 'compostable boxes'
+        'internal': {
+            'material': 'paper mesh wrap',
+            'reason': 'Provides shock absorption for fragile cosmetic bottles while being biodegradable.'
+        },
+        'external': {
+            'material': 'compostable boxes',
+            'reason': 'Sturdy and sustainable boxes ideal for cosmetics packaging.'
+        }
     },
     'cosmetic_tube': {
-        'internal': 'biodegradable bubble wrap',
-        'external': 'eco-mailer'
+        'internal': {
+            'material': 'biodegradable bubble wrap',
+            'reason': 'Protects small cosmetic tubes during transport while reducing plastic use.'
+        },
+        'external': {
+            'material': 'eco-mailer',
+            'reason': 'Lightweight, recyclable and eco-friendly for shipping compact items.'
+        }
     },
     'electronics': {
-        'internal': 'mushroom foam',
-        'external': 'corrugated fiberboard'
+        'internal': {
+            'material': 'mushroom foam',
+            'reason': 'Natural material molded to fit electronics and absorb impact; compostable.'
+        },
+        'external': {
+            'material': 'corrugated fiberboard',
+            'reason': 'Durable and protective outer packaging made from recycled paper fibers.'
+        }
     },
     'food_dry': {
-        'internal': 'cornstarch plastic',
-        'external': 'compostable wraps'
+        'internal': {
+            'material': 'cornstarch plastic',
+            'reason': 'Compostable material that protects dry food like chocolates, snacks, and grains.'
+        },
+        'external': {
+            'material': 'compostable wraps',
+            'reason': 'Eco-packaging suitable for various dry food items, reducing landfill waste.'
+        }
     },
     'home_decor': {
-        'internal': 'shredded paper',
-        'external': 'recycled carton'
+        'internal': {
+            'material': 'shredded paper',
+            'reason': 'Reusable and cushioning for vases, lamps, and other decor items.'
+        },
+        'external': {
+            'material': 'recycled carton',
+            'reason': 'Sturdy and recyclable box ideal for decorative and fragile items.'
+        }
     },
     'jewelry': {
-        'internal': 'paper pulp trays',
-        'external': 'reusable fabric boxes'
+        'internal': {
+            'material': 'paper pulp trays',
+            'reason': 'Secure and molded compartments for rings, earrings, and more — fully recyclable.'
+        },
+        'external': {
+            'material': 'reusable fabric boxes',
+            'reason': 'Elegant and reusable boxes that reduce single-use waste.'
+        }
     }
 }
 
@@ -85,9 +133,10 @@ def classify_image():
         return jsonify({
             'product_type': predicted_class,
             'prediction_accuracy': confidence_display,
-            'packaging_suggestion': suggestions.get(predicted_class, {})
-        })
-
+            'packaging_suggestion': {
+            'internal': suggestions[predicted_class]['internal'],
+            'external': suggestions[predicted_class]['external']
+       }})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

@@ -10,13 +10,18 @@ function App() {
   const handleChange = (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
-    setPreviewURL(URL.createObjectURL(selectedFile));
+    if (selectedFile) {
+      setPreviewURL(URL.createObjectURL(selectedFile));
+      setResult(null); // Clear old result on new file selection
+    }
   };
 
   const handleUpload = async () => {
     if (!file) return;
+
     const formData = new FormData();
     formData.append('image', file);
+
     try {
       const res = await axios.post('http://localhost:5000/classify', formData);
       setResult(res.data);
@@ -29,6 +34,7 @@ function App() {
     <div className="App">
       <h2>Upload Product Image</h2>
       <input type="file" onChange={handleChange} />
+      <br />
       <button onClick={handleUpload}>Upload & Classify</button>
 
       {previewURL && (
@@ -36,12 +42,17 @@ function App() {
           <div className="profile-img-wrapper">
             <img src={previewURL} alt="Preview" className="profile-img" />
           </div>
+
           {result && (
             <div className="profile-details">
-              <h3>{result.product_type.replace('_', ' ')}</h3>
+              <h3>Type: {result.product_type}</h3>
               <p><strong>Prediction Accuracy:</strong> {result.prediction_accuracy}</p>
-              <p><strong>Internal Packaging:</strong> {result.packaging_suggestion.internal}</p>
-              <p><strong>External Packaging:</strong> {result.packaging_suggestion.external}</p>
+
+              <p><strong>Internal Packaging:</strong> {result.packaging_suggestion.internal.material}</p>
+              <p><em>{result.packaging_suggestion.internal.reason}</em></p>
+
+              <p><strong>External Packaging:</strong> {result.packaging_suggestion.external.material}</p>
+              <p><em>{result.packaging_suggestion.external.reason}</em></p>
             </div>
           )}
         </div>
