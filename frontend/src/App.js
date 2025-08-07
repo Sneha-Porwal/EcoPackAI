@@ -27,7 +27,7 @@ function App() {
       {result && (
         <div>
           <p><strong>Type:</strong> {result.product_type}</p>
-          <p><strong>Prediction Accuracy:</strong> {(result.confidence * 100).toFixed(2)}%</p>
+          <p><strong>Prediction Accuracy:</strong> {result.prediction_accuracy}</p>
           <p><strong>Internal Packaging:</strong> {result.packaging_suggestion.internal}</p>
           <p><strong>External Packaging:</strong> {result.packaging_suggestion.external}</p>
         </div>

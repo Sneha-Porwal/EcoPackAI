@@ -3,27 +3,24 @@ from flask import Flask, request, jsonify
 from PIL import Image
 import numpy as np
 import tensorflow as tf
-import os
 
-# === App Setup ===
 app = Flask(__name__)
 CORS(app)
 
-# === Load Trained Model ===
 model = tf.keras.models.load_model('model.h5')
 
-# === Automatically Get Class Labels from Directory Order ===
+# Update to match your dataset folders
 CLASS_LABELS = [
     'books_stationery',
     'clothing_fashion',
-    'cosmetics',
+    'cosmetic_bottle',
+    'cosmetic_tube',
     'electronics',
     'food_dry',
     'home_decor',
     'jewelry'
 ]
 
-# === Packaging Suggestions ===
 suggestions = {
     'books_stationery': {
         'internal': 'recycled kraft paper',
@@ -33,9 +30,13 @@ suggestions = {
         'internal': 'compostable polybags',
         'external': 'jute bags'
     },
-    'cosmetics': {
-        'internal': 'molded pulp',
-        'external': 'cardboard boxes'
+    'cosmetic_bottle': {
+        'internal': 'paper mesh wrap',
+        'external': 'compostable boxes'
+    },
+    'cosmetic_tube': {
+        'internal': 'biodegradable bubble wrap',
+        'external': 'eco-mailer'
     },
     'electronics': {
         'internal': 'mushroom foam',
@@ -55,14 +56,11 @@ suggestions = {
     }
 }
 
-# === Image Preprocessing ===
 def preprocess_image(image, target_size=(224, 224)):
     image = image.convert('RGB').resize(target_size)
     image = np.array(image) / 255.0
-    image = np.expand_dims(image, axis=0)
-    return image
+    return np.expand_dims(image, axis=0)
 
-# === Classification Endpoint ===
 @app.route('/classify', methods=['POST'])
 def classify_image():
     if 'image' not in request.files:
@@ -74,23 +72,25 @@ def classify_image():
         processed = preprocess_image(image)
 
         prediction = model.predict(processed)[0]
+        print("Raw prediction:", prediction)  # DEBUG
 
-        if np.sum(prediction) == 0:
-            predicted_class = 'unknown'
-            confidence = 0.0
+        predicted_class = CLASS_LABELS[np.argmax(prediction)]
+        confidence = float(np.max(prediction))
+
+        if np.isnan(confidence):
+            confidence_display = "Unknown"
         else:
-            predicted_class = CLASS_LABELS[np.argmax(prediction)]
-            confidence = float(np.max(prediction)) * 100
+            confidence_display = f"{round(confidence * 100, 2)}%"
 
         return jsonify({
             'product_type': predicted_class,
-            'prediction_accuracy': f"{confidence:.2f}%",
+            'prediction_accuracy': confidence_display,
             'packaging_suggestion': suggestions.get(predicted_class, {})
         })
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# === Run App ===
+
 if __name__ == '__main__':
     app.run(debug=True)
