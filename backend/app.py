@@ -1,3 +1,5 @@
+# app.py
+
 from flask_cors import CORS
 from flask import Flask, request, jsonify
 from PIL import Image
@@ -11,7 +13,7 @@ CORS(app)
 # === Load Trained Model ===
 model = tf.keras.models.load_model('model.h5')
 
-# === Your Class Labels ===
+# === Your Class Labels (7 Classes) ===
 CLASS_LABELS = [
     'books_stationery',
     'clothing_fashion',
@@ -22,7 +24,7 @@ CLASS_LABELS = [
     'jewelry'
 ]
 
-# === Packaging Suggestions ===
+# === Packaging Suggestions (Based on Class) ===
 suggestions = {
     'books_stationery': {
         'internal': 'recycled kraft paper',
@@ -74,11 +76,11 @@ def classify_image():
 
         prediction = model.predict(processed)[0]
         predicted_class = CLASS_LABELS[np.argmax(prediction)]
-        confidence = float(np.max(prediction))
+        confidence_score = float(np.max(prediction))
 
         return jsonify({
             'product_type': predicted_class,
-            'confidence': confidence,
+            'prediction_confidence': f"{confidence_score:.2%}",
             'packaging_suggestion': suggestions.get(predicted_class, {})
         })
 

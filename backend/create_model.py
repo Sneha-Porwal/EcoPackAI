@@ -1,3 +1,5 @@
+# create_dummy_model.py
+
 import tensorflow as tf
 
 model = tf.keras.Sequential([
@@ -8,11 +10,11 @@ model = tf.keras.Sequential([
     tf.keras.layers.MaxPooling2D(),
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(64, activation='relu'),
-    tf.keras.layers.Dense(5, activation='softmax')  # 5 output classes
+    tf.keras.layers.Dense(7, activation='softmax')  # 7 output classes
 ])
 
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-# Save the model
 model.save('model.h5')
-print("Dummy model.h5 created successfully")
+print("Dummy model.h5 created successfully.")
+
