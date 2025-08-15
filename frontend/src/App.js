@@ -12,7 +12,7 @@ function App() {
     setFile(selectedFile);
     if (selectedFile) {
       setPreviewURL(URL.createObjectURL(selectedFile));
-      setResult(null); // Clear old result on new file selection
+      setResult(null); 
     }
   };
 
