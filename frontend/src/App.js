@@ -48,11 +48,15 @@ function App() {
               <h3>Type: {result.product_type}</h3>
               <p><strong>Prediction Accuracy:</strong> {result.prediction_accuracy}</p>
 
-              <p><strong>Internal Packaging:</strong> {result.packaging_suggestion.internal.material}</p>
-              <p><em>{result.packaging_suggestion.internal.reason}</em></p>
+              <p><strong>Internal Packaging:</strong> {result.packaging_suggestion?.internal?.material || 'N/A'}</p>
+              <p><em>{result.packaging_suggestion?.internal?.reason || 'N/A'}</em></p>
 
-              <p><strong>External Packaging:</strong> {result.packaging_suggestion.external.material}</p>
-              <p><em>{result.packaging_suggestion.external.reason}</em></p>
+              <p><strong>External Packaging:</strong> {result.packaging_suggestion?.external?.material || 'N/A'}</p>
+              <p><em>{result.packaging_suggestion?.external?.reason || 'N/A'}</em></p>
+
+              {result.product_type === 'Uncertain' && (
+                <p style={{color:'red'}}> Model is unsure about this product</p>
+              )}
             </div>
           )}
         </div>

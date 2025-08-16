@@ -16,9 +16,10 @@ CLASS_LABELS = [
     'cosmetic_bottle',
     'cosmetic_tube',
     'electronics',
-    'food_dry',
     'home_decor',
-    'jewelry'
+    'jewelry',
+    'Biscuits',
+    'DryFruits'
 ]
 
 suggestions = {
@@ -72,16 +73,6 @@ suggestions = {
             'reason': 'Durable and protective outer packaging made from recycled paper fibers.'
         }
     },
-    'food_dry': {
-        'internal': {
-            'material': 'cornstarch plastic',
-            'reason': 'Compostable material that protects dry food like chocolates, snacks, and grains.'
-        },
-        'external': {
-            'material': 'compostable wraps',
-            'reason': 'Eco-packaging suitable for various dry food items, reducing landfill waste.'
-        }
-    },
     'home_decor': {
         'internal': {
             'material': 'shredded paper',
@@ -101,7 +92,27 @@ suggestions = {
             'material': 'reusable fabric boxes',
             'reason': 'Elegant and reusable boxes that reduce single-use waste.'
         }
-    }
+    },
+    'Biscuits': {
+        'internal': {
+            'material': 'kraft paper or compostable film',
+            'reason': 'Keeps biscuits fresh while using recyclable materials.'
+        },
+        'external': {
+            'material': 'recyclable cardboard box',
+            'reason': 'Eco-friendly box suitable for shipping biscuit packs.'
+        }
+    },
+    'DryFruits': {
+        'internal': {
+            'material': 'paper pouch / compostable bag',
+            'reason': 'Protects nuts and dry fruits and is biodegradable.'
+        },
+        'external': {
+            'material': 'cardboard box / paper bag / glass jar',
+            'reason': 'Eco-friendly options for storing and shipping dry fruits.'
+        }
+    },
 }
 
 def preprocess_image(image, target_size=(224, 224)):
@@ -143,3 +154,5 @@ def classify_image():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
