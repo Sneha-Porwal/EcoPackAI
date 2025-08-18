@@ -7,20 +7,11 @@ import tensorflow as tf
 app = Flask(__name__)
 CORS(app)
 
-model = tf.keras.models.load_model('model.h5')
+model = tf.keras.models.load_model("best_model.keras")
 
-# Update to match your dataset folders
-CLASS_LABELS = [
-    'books_stationery',
-    'clothing_fashion',
-    'cosmetic_bottle',
-    'cosmetic_tube',
-    'electronics',
-    'home_decor',
-    'jewelry',
-    'Biscuits',
-    'DryFruits'
-]
+# Load class labels from file (auto sync with dataset)
+with open("class_labels.txt", "r") as f:
+    CLASS_LABELS = [line.strip() for line in f.readlines()]
 
 suggestions = {
     'books_stationery': {
@@ -113,20 +104,46 @@ suggestions = {
             'reason': 'Eco-friendly options for storing and shipping dry fruits.'
         }
     },
+    'chocolates': {
+        'internal': {
+            'material': 'compostable foil wrap or paper-based wrap',
+            'reason': 'Keeps chocolates fresh and protected while being biodegradable and reducing plastic waste.'
+        },
+        'external': {
+            'material': 'recyclable cardboard box',
+            'reason': 'Strong outer packaging that protects chocolates during shipping and is eco-friendly.'
+        }
+    },
+    'Snacks': {
+        'internal': {
+            'material': 'compostable film or kraft paper pouch',
+            'reason': 'Provides freshness and protection for chips, namkeen, and other snacks while reducing single-use plastic.'
+        },
+        'external': {
+            'material': 'paperboard carton or recycled cardboard box',
+            'reason': 'Sturdy and stackable, suitable for bulk snack shipments while being recyclable.'
+        }
+    },
 }
 
+# ==============================
+# Preprocess image for model input
+# ==============================
 def preprocess_image(image, target_size=(224, 224)):
-    image = image.convert('RGB').resize(target_size)
+    image = image.convert("RGB").resize(target_size)
     image = np.array(image) / 255.0
     return np.expand_dims(image, axis=0)
 
-@app.route('/classify', methods=['POST'])
+# ==============================
+# API endpoint for classification
+# ==============================
+@app.route("/classify", methods=["POST"])
 def classify_image():
-    if 'image' not in request.files:
-        return jsonify({'error': 'No image uploaded'}), 400
+    if "image" not in request.files:
+        return jsonify({"error": "No image uploaded"}), 400
 
     try:
-        img_file = request.files['image']
+        img_file = request.files["image"]
         image = Image.open(img_file)
         processed = preprocess_image(image)
 
@@ -142,17 +159,19 @@ def classify_image():
             confidence_display = f"{round(confidence * 100, 2)}%"
 
         return jsonify({
-            'product_type': predicted_class,
-            'prediction_accuracy': confidence_display,
-            'packaging_suggestion': {
-            'internal': suggestions[predicted_class]['internal'],
-            'external': suggestions[predicted_class]['external']
-       }})
+            "product_type": predicted_class,
+            "prediction_accuracy": confidence_display,
+            "packaging_suggestion": {
+                "internal": suggestions[predicted_class]["internal"],
+                "external": suggestions[predicted_class]["external"]
+            }
+        })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
+
+
 
 

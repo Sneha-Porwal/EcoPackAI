@@ -1,0 +1,11 @@
+Biscuits
+DryFruits
+Snacks
+books_stationery
+chocolates
+clothing_fashion
+cosmetic_bottle
+cosmetic_tube
+electronics
+home_decor
+jewelry
