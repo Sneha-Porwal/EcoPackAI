@@ -1,10 +1,14 @@
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image_dataset_from_directory
-from tensorflow.keras.applications import MobileNetV2
+from tensorflow.keras.applications import MobileNetV2, mobilenet_v2
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D, Dropout
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
+import pickle
 
+# ==============================
+# CONFIG
+# ==============================
 DATASET_DIR = "dataset"  
 BATCH_SIZE = 8
 IMG_SIZE = (224, 224)
@@ -40,10 +44,18 @@ with open("class_labels.txt", "w") as f:
     for name in class_names:
         f.write(name + "\n")
 
-# Optimize performance
+# ==============================
+# OPTIMIZE PERFORMANCE
+# ==============================
 AUTOTUNE = tf.data.AUTOTUNE
-train_ds = train_ds.prefetch(buffer_size=AUTOTUNE)
-val_ds = val_ds.prefetch(buffer_size=AUTOTUNE)
+# MobileNetV2 expects -1 to 1 range
+normalization_layer = tf.keras.layers.Rescaling(1./127.5, offset=-1)
+
+train_ds = train_ds.map(lambda x, y: (normalization_layer(x), y))
+val_ds = val_ds.map(lambda x, y: (normalization_layer(x), y))
+
+train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
+val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
 # ==============================
 # DATA AUGMENTATION
@@ -56,8 +68,11 @@ data_augmentation = tf.keras.Sequential([
     tf.keras.layers.RandomTranslation(0.1, 0.1),
 ])
 
+# ==============================
+# BASE MODEL
+# ==============================
 base_model = MobileNetV2(weights="imagenet", include_top=False, input_shape=(224, 224, 3))
-base_model.trainable = False  # freeze backbone
+base_model.trainable = False  # freeze backbone first
 
 inputs = tf.keras.Input(shape=(224, 224, 3))
 x = data_augmentation(inputs)
@@ -82,7 +97,7 @@ model.compile(
 # ==============================
 callbacks = [
     tf.keras.callbacks.EarlyStopping(patience=5, restore_best_weights=True),
-    tf.keras.callbacks.ModelCheckpoint("best_model.keras", save_best_only=True)  # NEW
+    tf.keras.callbacks.ModelCheckpoint("best_model.keras", save_best_only=True)
 ]
 
 # ==============================
@@ -95,8 +110,37 @@ history = model.fit(
     callbacks=callbacks
 )
 
+# ==============================
+# SAVE MODELS & HISTORY
+# ==============================
 model.save("model.keras")   
 print("Final model saved as model.keras")
 print("Best model saved as best_model.keras")
-print("Class labels saved to class_labels.txt")
 
+with open("history.pkl", "wb") as f:
+    pickle.dump(history.history, f)
+print("Training history saved as history.pkl")
+
+# ==============================
+# OPTIONAL: FINE-TUNE
+# ==============================
+print("\n>>> Starting optional fine-tuning ...")
+base_model.trainable = True
+for layer in base_model.layers[:-30]:  # keep most frozen, unfreeze last 30 layers
+    layer.trainable = False
+
+model.compile(
+    optimizer=Adam(learning_rate=1e-5),
+    loss="sparse_categorical_crossentropy",
+    metrics=["accuracy"]
+)
+
+fine_tune_history = model.fit(
+    train_ds,
+    validation_data=val_ds,
+    epochs=10,
+    callbacks=callbacks
+)
+
+model.save("fine_tuned_model.keras")
+print("Fine-tuned model saved as fine_tuned_model.keras")

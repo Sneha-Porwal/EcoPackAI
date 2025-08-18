@@ -1,11 +1,17 @@
 Biscuits
 DryFruits
+Earphones _Headphones
+Laptops
+Mobile phones_smartwatches_digital watches
 Snacks
 books_stationery
+cameras_drones
 chocolates
 clothing_fashion
 cosmetic_bottle
 cosmetic_tube
 electronics
 home_decor
+input_devices
 jewelry
+remotes_calculators
