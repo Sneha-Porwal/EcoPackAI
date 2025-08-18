@@ -236,16 +236,6 @@ suggestions = {
             'reason': 'Lightweight, recyclable and eco-friendly for shipping compact items.'
         }
     },
-    'electronics': {
-        'internal': {
-            'material': 'mushroom foam',
-            'reason': 'Natural material molded to fit electronics and absorb impact; compostable.'
-        },
-        'external': {
-            'material': 'corrugated fiberboard',
-            'reason': 'Durable and protective outer packaging made from recycled paper fibers.'
-        }
-    },
     'home_decor': {
         'internal': {
             'material': 'shredded paper',

@@ -10,7 +10,6 @@ chocolates
 clothing_fashion
 cosmetic_bottle
 cosmetic_tube
-electronics
 home_decor
 input_devices
 jewelry
