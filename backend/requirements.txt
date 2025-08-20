@@ -1,6 +1,10 @@
-
 flask
-tensorflow
+tensorflow>=2.7
 pillow
 numpy
+
+fastapi
+uvicorn
+
 flask-cors
+
